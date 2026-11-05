@@ -1,0 +1,736 @@
+<title>Ampere Sur</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Concepto: ficha técnica de ingeniería. Banda azul de plano unifilar arriba, cobre como único acento,
+   franja verde/amarilla de puesta a tierra como separador. Todo el contenido sale del objeto CONFIG al final del archivo. */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --ink:#0F2236; --muted:#566779; --line:#D8DFE7;
+  --hero:#0F2A44; --hero-2:#16385A; --hero-line:rgba(160,196,232,.14); --on-hero:#EAF1F8; --on-hero-muted:#A9BFD6;
+  --copper:#B4571B; --copper-ink:#8F4311; --copper-soft:#F7E8DB; --on-copper:#FFFFFF;
+  --earth-y:#E3BE1B; --earth-g:#2E8B57; --ok:#237548; --focus:#1B6FD1; --hdr:#FFFFFF;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1520; --surface:#122030; --ink:#E7EEF5; --muted:#98A9BB; --line:#233549;
+  --hero:#08121D; --hero-2:#0F2236; --hero-line:rgba(140,180,220,.10);
+  --copper:#E58E50; --copper-ink:#F0A877; --copper-soft:#33231A; --on-copper:#1A0E06;
+  --earth-y:#D9B51A; --earth-g:#3AA16A; --ok:#5CC38A; --focus:#6FB0FF; --hdr:#0E1B29; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1520; --surface:#122030; --ink:#E7EEF5; --muted:#98A9BB; --line:#233549;
+  --hero:#08121D; --hero-2:#0F2236; --hero-line:rgba(140,180,220,.10);
+  --copper:#E58E50; --copper-ink:#F0A877; --copper-soft:#33231A; --on-copper:#1A0E06;
+  --earth-y:#D9B51A; --earth-g:#3AA16A; --ok:#5CC38A; --focus:#6FB0FF; --hdr:#0E1B29; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--hdr);z-index:30}
+h1,h2,h3{font-family:var(--f-display);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:clamp(1.7rem,3.4vw,2.35rem);font-weight:700}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1160px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--f-mono);font-weight:500}
+.eyebrow{font:500 .78rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--copper-ink)}
+.earth{height:5px;background:repeating-linear-gradient(135deg,var(--earth-y) 0 12px,var(--earth-g) 12px 24px)}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:46px;padding:.65rem 1.2rem;border-radius:4px;border:1.5px solid transparent;font:600 .98rem var(--f-body);text-decoration:none;cursor:pointer;transition:transform .12s,background .12s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--copper);color:var(--on-copper)}
+.btn-primary:hover{filter:brightness(1.07)}
+.btn-ghost{background:transparent;color:var(--on-hero);border-color:rgba(234,241,248,.45)}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn-line{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn-line:hover{border-color:var(--copper)}
+.btn-sm{min-height:38px;padding:.4rem .9rem;font-size:.9rem}
+
+/* Cabecera */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--hdr);border-bottom:1px solid var(--line)}
+.hdr-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:64px}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.brand svg{flex:none}
+.brand b{font:700 1.2rem var(--f-display);letter-spacing:-.01em;display:block;line-height:1.1}
+.brand span{font:500 .68rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block}
+.nav{display:flex;gap:1.4rem}
+.nav a{text-decoration:none;font-weight:500;font-size:.95rem;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+@media (max-width:860px){.nav{display:none}}
+
+/* Hero */
+.hero{background:var(--hero);color:var(--on-hero);
+  background-image:linear-gradient(var(--hero-line) 1px,transparent 1px),linear-gradient(90deg,var(--hero-line) 1px,transparent 1px);
+  background-size:36px 36px}
+.hero-in{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;padding-block:clamp(2.5rem,6vw,4.5rem)}
+.hero h1{font-size:clamp(2.1rem,5vw,3.5rem);font-weight:700;color:#fff}
+.hero .lead{margin-top:1.1rem;font-size:1.1rem;color:var(--on-hero-muted);max-width:56ch}
+.hero .eyebrow{color:#F0A877;margin-bottom:1rem;display:block}
+.cta-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.7rem}
+.creds{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;margin-top:1.8rem;padding:0;list-style:none;font-size:.9rem;color:var(--on-hero-muted)}
+.creds li{display:flex;align-items:center;gap:.45rem}
+.creds li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--earth-y)}
+@media (max-width:860px){.hero-in{grid-template-columns:minmax(0,1fr)}}
+
+/* Escala de tensión */
+.ladder{position:relative;display:grid;gap:1rem;padding-left:34px}
+.ladder::before{content:"";position:absolute;left:11px;top:14px;bottom:14px;width:3px;background:linear-gradient(var(--copper),#6FA8DC)}
+.lv{position:relative;background:var(--hero-2);border:1px solid rgba(160,196,232,.22);border-radius:6px;padding:1.1rem 1.2rem}
+.lv::before{content:"";position:absolute;left:-30px;top:1.45rem;width:18px;height:18px;border-radius:50%;background:var(--hero);border:3px solid var(--copper)}
+.lv.bt::before{border-color:#6FA8DC}
+.lv .k{font:500 .72rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--on-hero-muted)}
+.lv .v{font:700 1.55rem/1.15 var(--f-display);color:#fff;margin:.2rem 0 .35rem}
+.lv .d{font-size:.92rem;color:var(--on-hero-muted)}
+.lv.off{opacity:.6;border-style:dashed}
+
+/* Secciones */
+section.s{padding-block:clamp(2.8rem,6vw,4.6rem)}
+.s-head{display:grid;gap:.7rem;max-width:62ch;margin-bottom:2rem}
+.s-head p{color:var(--muted)}
+.s-alt{background:var(--surface);border-block:1px solid var(--line)}
+
+/* Servicios */
+.tabs{display:inline-flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;background:var(--surface)}
+.tab{appearance:none;border:0;background:transparent;color:var(--muted);font:600 .95rem var(--f-body);padding:.7rem 1.2rem;cursor:pointer;min-height:46px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:1rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.3rem;display:flex;flex-direction:column;gap:.75rem;min-width:0}
+.card p{color:var(--muted);font-size:.95rem}
+.card .push{margin-top:auto;padding-top:.4rem}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{font:500 .74rem var(--f-mono);padding:.22rem .5rem;border-radius:3px;background:var(--copper-soft);color:var(--copper-ink)}
+.chip.plain{background:transparent;border:1px solid var(--line);color:var(--muted)}
+
+/* Asistente */
+.wiz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.5rem;align-items:start}
+@media (max-width:900px){.wiz{grid-template-columns:minmax(0,1fr)}}
+.step{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1.2rem}
+.step + .step{margin-top:1rem}
+.step h3{font-size:1rem;margin-bottom:.8rem;display:flex;gap:.6rem;align-items:center}
+.step h3 i{font:500 .8rem var(--f-mono);font-style:normal;background:var(--ink);color:var(--bg);border-radius:3px;padding:.15rem .45rem}
+.opts{display:flex;flex-wrap:wrap;gap:.5rem}
+.opt{appearance:none;font:500 .93rem var(--f-body);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:4px;padding:.55rem .9rem;cursor:pointer;min-height:42px}
+.opt:hover{border-color:var(--copper)}
+.opt[aria-pressed="true"]{border-color:var(--copper);background:var(--copper-soft);color:var(--copper-ink);font-weight:600}
+.result{background:var(--surface);border:1.5px solid var(--ink);border-radius:6px;padding:1.4rem;display:grid;gap:1rem}
+.result.empty{border-style:dashed;border-color:var(--line);color:var(--muted);text-align:left}
+.result h3{font-size:1.3rem}
+.result ol{margin:0;padding-left:1.2rem;display:grid;gap:.3rem}
+.result h4{font:500 .75rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 .4rem}
+.note{font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:.8rem}
+
+/* Solar */
+.solar{background:var(--hero);color:var(--on-hero);
+  background-image:linear-gradient(var(--hero-line) 1px,transparent 1px),linear-gradient(90deg,var(--hero-line) 1px,transparent 1px);background-size:36px 36px}
+.solar h2{color:#fff}
+.solar .s-head p{color:var(--on-hero-muted)}
+.solar .eyebrow{color:#F0A877}
+.solar-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem;align-items:start}
+@media (max-width:900px){.solar-grid{grid-template-columns:minmax(0,1fr)}}
+.sol-types{display:grid;gap:.8rem}
+.sol-type{border:1px solid rgba(160,196,232,.25);border-radius:6px;padding:1rem 1.1rem;background:var(--hero-2)}
+.sol-type h3{color:#fff;font-size:1.05rem}
+.sol-type p{color:var(--on-hero-muted);font-size:.93rem;margin-top:.3rem}
+.sol-flow-t{font:500 .75rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--on-hero-muted);margin:1.6rem 0 .7rem}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:.55rem;counter-reset:f}
+.flow li{counter-increment:f;display:flex;gap:.8rem;align-items:baseline;color:var(--on-hero);font-size:.95rem}
+.flow li::before{content:counter(f);flex:none;width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid var(--earth-y);display:grid;place-items:center;font:500 .78rem var(--f-mono);color:var(--earth-y)}
+.calc{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:clamp(1.1rem,3vw,1.6rem);display:grid;gap:1.1rem}
+.calc h3{font-size:1.25rem}
+.calc-out{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.kpi{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:.8rem .9rem}
+.kpi b{display:block;font:700 1.55rem/1.1 var(--f-display);color:var(--copper-ink)}
+.kpi small{color:var(--muted);font-size:.8rem}
+
+/* Normativa */
+.norm{display:grid;gap:.9rem}
+.nrow{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:1rem;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.1rem 1.2rem}
+.nrow .code{font:700 1.35rem var(--f-display);color:var(--copper-ink)}
+.nrow .code small{display:block;font:500 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.1rem}
+.nrow p{color:var(--muted);font-size:.95rem;margin-top:.25rem}
+.nrow a{font-size:.88rem;font-weight:600;color:var(--copper-ink);white-space:nowrap}
+@media (max-width:720px){.nrow{grid-template-columns:minmax(0,1fr)}}
+details.ric{margin-top:1.4rem;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+details.ric summary{padding:1rem 1.2rem;font-weight:600;cursor:pointer}
+.rics{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:.4rem .9rem;padding:0 1.2rem 1.2rem;margin:0;list-style:none;font-size:.92rem}
+.rics li{display:flex;gap:.6rem}
+.rics b{font:500 .8rem var(--f-mono);color:var(--copper-ink);flex:none;padding-top:.1rem}
+
+/* Proceso */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:1rem;list-style:none;padding:0;margin:0;counter-reset:p}
+.steps li{counter-increment:p;border-top:3px solid var(--ink);padding-top:.9rem;display:grid;gap:.4rem;align-content:start}
+.steps li::before{content:counter(p,decimal-leading-zero);font:500 .85rem var(--f-mono);color:var(--copper-ink)}
+.steps p{color:var(--muted);font-size:.93rem}
+
+/* FAQ */
+.faq{display:grid;gap:.6rem;max-width:820px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.faq summary{padding:1rem 1.2rem;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font:500 1.3rem/1 var(--f-mono);color:var(--copper-ink)}
+.faq details[open] summary::after{content:"–"}
+.faq details p{padding:0 1.2rem 1.1rem;color:var(--muted)}
+
+/* Contacto */
+.contact-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr);gap:1.5rem;align-items:start}
+@media (max-width:900px){.contact-grid{grid-template-columns:minmax(0,1fr)}}
+form.f{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:clamp(1.1rem,3vw,1.8rem);display:grid;gap:1.1rem}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+@media (max-width:620px){.fgrid{grid-template-columns:minmax(0,1fr)}}
+.fld{display:grid;gap:.35rem;min-width:0}
+.fld.full{grid-column:1/-1}
+label,.lbl{font-weight:600;font-size:.92rem}
+.req{color:var(--copper-ink)}
+input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],select,textarea{width:100%;font:400 1rem var(--f-body);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:4px;padding:.65rem .75rem;min-height:46px}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--focus)}
+.help{font-size:.82rem;color:var(--muted)}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+.rcs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem}
+@media (max-width:620px){.rcs{grid-template-columns:minmax(0,1fr)}}
+.rc{position:relative;display:block}
+.rc input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.rc span{display:grid;gap:.15rem;border:1.5px solid var(--line);border-radius:4px;padding:.8rem .9rem;background:var(--bg);height:100%}
+.rc span b{font-size:.95rem}
+.rc span small{color:var(--muted);font-size:.8rem;font-weight:400}
+.rc input:checked + span{border-color:var(--copper);background:var(--copper-soft)}
+.rc input:checked + span b{color:var(--copper-ink)}
+.rc input:focus-visible + span{outline:3px solid var(--focus);outline-offset:2px}
+.check{display:flex;gap:.6rem;align-items:flex-start;font-weight:400;font-size:.88rem;color:var(--muted)}
+.check input{margin-top:.3rem;width:18px;height:18px;accent-color:var(--copper);flex:none}
+.tips{background:var(--copper-soft);border-radius:6px;padding:1rem 1.1rem;font-size:.9rem}
+.tips ul{margin:.5rem 0 0;padding-left:1.1rem;display:grid;gap:.25rem}
+.side{display:grid;gap:1rem}
+.side .box{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.2rem;display:grid;gap:.5rem}
+.side .box b.big{font:700 1.2rem var(--f-display)}
+.sent{background:var(--surface);border:2px solid var(--ok);border-radius:6px;padding:1.4rem;display:grid;gap:1rem}
+.sent textarea{font:500 .85rem/1.55 var(--f-mono);min-height:210px}
+.sent .row{display:flex;flex-wrap:wrap;gap:.6rem}
+
+footer{background:var(--hero);color:var(--on-hero-muted);padding-block:2.2rem;font-size:.9rem}
+footer .wrap{display:grid;gap:.6rem}
+footer b{color:#fff;font-family:var(--f-display);font-size:1.1rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+[id]{scroll-margin-top:84px}
+</style>
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a class="brand" href="#inicio" aria-label="Inicio">
+      <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="5" fill="#0F2A44"/><path d="M5 22c4-12 8-12 11 0s7 12 11 0 4-6 6-6" fill="none" stroke="#E58E50" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="31" width="28" height="2.5" fill="#E3BE1B"/></svg>
+      <div><b data-c="empresa.nombre"></b><span data-c="empresa.subtitulo"></span></div>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#servicios">Servicios</a><a href="#solar">Solar</a><a href="#guia">Guía</a><a href="#normativa">Normativa</a><a href="#proceso">Cómo trabajamos</a><a href="#faq">Preguntas</a>
+    </nav>
+    <a class="btn btn-primary btn-sm" href="#contacto" data-go="visita">Solicitar visita</a>
+  </div>
+</header>
+<div class="earth"></div>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div>
+        <span class="eyebrow" data-c="hero.eyebrow"></span>
+        <h1 data-c="hero.titulo"></h1>
+        <p class="lead" data-c="hero.bajada"></p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#contacto" data-go="visita">Agendar visita técnica</a>
+          <a class="btn btn-ghost" href="#contacto" data-go="presupuesto">Pedir presupuesto</a>
+        </div>
+        <ul class="creds" id="creds"></ul>
+      </div>
+      <div class="ladder" id="ladder" aria-label="Niveles de tensión que atendemos"></div>
+    </div>
+  </section>
+
+  <section class="s" id="servicios">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="eyebrow">Servicios</span>
+        <h2>Lo que hacemos, según el nivel de tensión</h2>
+        <p>Cada servicio indica el pliego técnico que lo rige. Elige uno para pedir presupuesto con los datos ya cargados.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Nivel de tensión">
+        <button class="tab" role="tab" id="tab-BT" data-nivel="BT" aria-selected="true">Baja tensión</button>
+        <button class="tab" role="tab" id="tab-MT" data-nivel="MT" aria-selected="false">Media tensión</button>
+      </div>
+      <div class="grid" id="svc" role="tabpanel"></div>
+    </div>
+  </section>
+
+  <section class="s solar" id="solar">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="eyebrow">Energía solar</span>
+        <h2>Sistemas fotovoltaicos con trámite incluido</h2>
+        <p>Diseñamos e instalamos paneles conectados a la red y nos encargamos de la declaración ante la SEC y de la coordinación con tu distribuidora.</p>
+      </div>
+      <div class="solar-grid">
+        <div>
+          <div class="sol-types" id="sol-types"></div>
+          <div class="sol-flow-t">Trámite de un sistema conectado a la red</div>
+          <ol class="flow" id="sol-flow"></ol>
+        </div>
+        <div class="calc">
+          <div><span class="eyebrow">Dimensionamiento rápido</span><h3 style="margin-top:.4rem">¿De qué tamaño sería tu sistema?</h3></div>
+          <div class="fgrid">
+            <div class="fld full"><label for="c-consumo">Consumo mensual (kWh)</label><input type="number" id="c-consumo" min="1" max="100000" step="1" inputmode="numeric"><span class="help">Aparece en tu boleta de luz como consumo del mes. El valor inicial es un ejemplo.</span></div>
+            <div class="fld"><label for="c-zona">Zona del país</label><select id="c-zona"></select></div>
+            <div class="fld"><label for="c-cob">Cubrir del consumo</label><select id="c-cob"><option value="0.5">50%</option><option value="0.8">80%</option><option value="1" selected>100%</option></select></div>
+          </div>
+          <div class="calc-out" id="c-out" aria-live="polite"></div>
+          <p class="help" id="c-nota"></p>
+          <div><button class="btn btn-primary" type="button" id="c-pedir">Pedir presupuesto con estos datos</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s s-alt" id="guia">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="eyebrow">Guía rápida</span>
+        <h2>¿No sabes qué necesitas? Responde dos preguntas</h2>
+        <p>Te mostramos el servicio que corresponde, la normativa asociada y qué conviene tener a mano. Después puedes enviar la consulta con todo prellenado.</p>
+      </div>
+      <div class="wiz">
+        <div>
+          <div class="step"><h3><i>1</i> ¿Qué tipo de instalación es?</h3><div class="opts" id="w-tipo"></div></div>
+          <div class="step"><h3><i>2</i> ¿Qué necesitas hacer?</h3><div class="opts" id="w-need"></div></div>
+        </div>
+        <div id="w-out" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="normativa">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="eyebrow">Normativa vigente</span>
+        <h2>Trabajamos sobre los reglamentos de la SEC</h2>
+        <p>Estas son las normas que ordenan nuestro trabajo. Son referencias informativas: el texto oficial vigente está en los enlaces.</p>
+      </div>
+      <div class="norm" id="norm"></div>
+      <details class="ric">
+        <summary>Ver los 19 pliegos técnicos RIC (instalaciones de consumo)</summary>
+        <ul class="rics" id="rics"></ul>
+      </details>
+    </div>
+  </section>
+
+  <section class="s s-alt" id="proceso">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="eyebrow">Cómo trabajamos</span>
+        <h2>Del primer contacto a la instalación declarada</h2>
+      </div>
+      <ol class="steps" id="steps"></ol>
+    </div>
+  </section>
+
+  <section class="s" id="faq">
+    <div class="wrap">
+      <div class="s-head"><span class="eyebrow">Preguntas frecuentes</span><h2>Antes de escribirnos</h2></div>
+      <div class="faq" id="faqs"></div>
+    </div>
+  </section>
+
+  <section class="s s-alt" id="contacto">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="eyebrow">Contacto</span>
+        <h2>Consulta, visita técnica o presupuesto</h2>
+        <p>Elige qué necesitas y completa lo que sepas. Los campos con ayuda te dicen dónde encontrar cada dato.</p>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <form class="f" id="form" autocomplete="on">
+            <fieldset>
+              <span class="lbl">¿Qué necesitas? <span class="req">*</span></span>
+              <div class="rcs" style="margin-top:.5rem">
+                <label class="rc"><input type="radio" name="tipo" value="consulta"><span><b>Consulta</b><small>Resolver una duda técnica o normativa</small></span></label>
+                <label class="rc"><input type="radio" name="tipo" value="visita" checked><span><b>Visita técnica</b><small>Revisar la instalación en terreno</small></span></label>
+                <label class="rc"><input type="radio" name="tipo" value="presupuesto"><span><b>Presupuesto</b><small>Cotizar un trabajo definido</small></span></label>
+              </div>
+            </fieldset>
+            <div class="fgrid">
+              <div class="fld"><label for="nombre">Nombre <span class="req">*</span></label><input type="text" id="nombre" name="nombre" required autocomplete="name"></div>
+              <div class="fld"><label for="telefono">Teléfono o WhatsApp <span class="req">*</span></label><input type="tel" id="telefono" name="telefono" required autocomplete="tel" placeholder="+56 9 ..."><span class="help">Te contactamos por aquí para coordinar.</span></div>
+              <div class="fld"><label for="email">Correo</label><input type="email" id="email" name="email" autocomplete="email"></div>
+              <div class="fld"><label for="comuna">Comuna <span class="req">*</span></label><input type="text" id="comuna" name="comuna" required autocomplete="address-level2"><span class="help">Dónde está la instalación, no donde vives.</span></div>
+              <div class="fld"><label for="nivel">Nivel de tensión</label>
+                <select id="nivel" name="nivel"><option value="No sé">No lo sé</option><option value="Baja tensión">Baja tensión</option><option value="Media tensión">Media tensión</option></select>
+                <span class="help">Si es una casa, local u oficina, casi seguro es baja tensión (220 V o 380 V). Si hay una subestación o celdas propias, es media.</span></div>
+              <div class="fld"><label for="inmueble">Tipo de inmueble</label><select id="inmueble" name="inmueble"></select></div>
+              <div class="fld full"><label for="servicio">Servicio de interés</label><select id="servicio" name="servicio"></select></div>
+              <div class="fld full"><label for="potencia">Potencia o capacidad actual (opcional)</label><input type="text" id="potencia" name="potencia" placeholder="Ej. automático general de 40 A, o 12 kW contratados">
+                <span class="help">Mira tu boleta de luz (potencia contratada) o el automático general del tablero. Si no la encuentras, déjalo en blanco.</span></div>
+              <div class="fld full"><label for="detalle">Cuéntanos qué pasa o qué quieres hacer <span class="req">*</span></label><textarea id="detalle" name="detalle" required placeholder="Ej. Ampliación de 80 m² con cocina nueva y necesito certificar la instalación."></textarea></div>
+              <div class="fld" id="f-fecha"><label for="fecha">Fecha preferida para la visita</label><input type="date" id="fecha" name="fecha"></div>
+              <div class="fld" id="f-franja"><label for="franja">Horario</label><select id="franja" name="franja"><option>Cualquier horario</option><option>Mañana (9:00 a 13:00)</option><option>Tarde (14:00 a 18:00)</option></select></div>
+            </div>
+            <div class="tips" id="tips"></div>
+            <label class="check"><input type="checkbox" id="ok" required><span data-c="legal.consentimiento"></span></label>
+            <div><button class="btn btn-primary" type="submit">Preparar solicitud</button></div>
+          </form>
+          <div id="sent" hidden></div>
+        </div>
+        <aside class="side">
+          <div class="box"><span class="eyebrow">Atención</span><b class="big" data-c="empresa.telefono"></b><span data-c="empresa.email"></span><span class="help" data-c="empresa.horario"></span><span class="help" data-c="empresa.zona"></span></div>
+          <div class="box"><span class="eyebrow">Tiempos</span><span data-c="plazos.respuesta"></span><span data-c="plazos.presupuesto"></span></div>
+          <div class="box"><span class="eyebrow">Respaldo</span><span data-c="empresa.licencia"></span></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <b data-c="empresa.razon"></b>
+    <span data-c="empresa.licencia"></span>
+    <span data-c="legal.aviso"></span>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   CONFIG: edita aquí los textos, datos de contacto, servicios y normativa.
+   El resto del archivo no necesita cambios.
+   ===================================================================== */
+const CONFIG = {
+  empresa: {
+    nombre: "Ampere Sur",
+    subtitulo: "Ingeniería eléctrica",
+    razon: "Ampere Sur Ingeniería Eléctrica SpA",
+    telefono: "+56 9 0000 0000",
+    whatsapp: "56900000000",            // solo dígitos, con código de país
+    email: "contacto@tuempresa.cl",
+    zona: "Cobertura: Santiago y zona central (editar)",
+    horario: "Lun a Vie 8:30 a 18:00 · Sáb 9:00 a 13:00",
+    licencia: "Instalador eléctrico autorizado SEC, Clase A. N° de registro: (editar)"
+  },
+  formEndpoint: "",                     // Opcional: URL de un servicio de formularios (Formspree, Getform, tu API). Si se deja vacío, la solicitud se envía por WhatsApp o se copia.
+  hero: {
+    eyebrow: "Baja y media tensión · Chile",
+    titulo: "Instalaciones eléctricas seguras, proyectadas y declaradas según norma",
+    bajada: "Proyecto, ejecución y trámite ante la SEC para viviendas, comercio e industria, incluidos sistemas fotovoltaicos. Agenda una visita o pide un presupuesto en pocos minutos."
+  },
+  credenciales: [
+    "Instalador autorizado SEC",
+    "Declaraciones TE-1 y TE-4",
+    "Trabajo según DS 8 y DS 109",
+    "Informe escrito de cada visita"
+  ],
+  niveles: [
+    { cls: "mt", k: "Media tensión", v: "12 a 23 kV", d: "Subestaciones, celdas y redes privadas en industria, minería y loteos." },
+    { cls: "bt", k: "Baja tensión", v: "220 V · 380 V · 50 Hz", d: "Viviendas, comercio, oficinas e industria liviana." },
+    { cls: "off", k: "Fuera de alcance", v: "Alta tensión", d: "Líneas de transmisión y subestaciones de poder. Te derivamos." }
+  ],
+  inmuebles: ["Casa", "Departamento o edificio", "Local comercial u oficina", "Industria o faena", "Loteo o proyecto inmobiliario", "Otro"],
+  servicios: [
+    { id: "nuevas", nivel: "BT", t: "Instalaciones nuevas y ampliaciones", d: "Empalme, alimentadores, canalizaciones y circuitos para obra nueva o ampliación, con proyecto cuando corresponde.", refs: ["RIC 01", "RIC 03", "RIC 04", "RIC 10"] },
+    { id: "tableros", nivel: "BT", t: "Tableros y protecciones", d: "Diseño, armado y recambio de tableros con protecciones diferenciales y magnetotérmicas dimensionadas a la carga.", refs: ["RIC 02", "RIC 05"] },
+    { id: "tierra", nivel: "BT", t: "Puesta a tierra y mediciones", d: "Malla o electrodo de tierra, enlace equipotencial y medición de resistencia con informe.", refs: ["RIC 06"] },
+    { id: "tramites", nivel: "BT", t: "Regularización y declaración TE-1", d: "Revisión de instalaciones existentes, correcciones y declaración ante la SEC para poder conectar o regularizar.", refs: ["RIC 18", "RIC 19"] },
+    { id: "iluminacion", nivel: "BT", t: "Iluminación y eficiencia energética", d: "Cambio a LED, control de iluminación y revisión de cargas para bajar el consumo.", refs: ["RIC 10", "RIC 14"] },
+    { id: "ve", nivel: "BT", t: "Carga de vehículos eléctricos", d: "Cargadores en casas, edificios y estacionamientos, con tablero y protecciones propias.", refs: ["RIC 15"] },
+    { id: "solar", nivel: "BT", t: "Sistema fotovoltaico residencial", d: "Paneles en techo conectados a la red, con inversor, protecciones, declaración TE-4 y coordinación con la distribuidora.", refs: ["RIC 09", "TE-4", "Ley 20.571"] },
+    { id: "solarEmp", nivel: "BT", t: "Fotovoltaico comercial e industrial", d: "Sistemas de mayor potencia para locales, bodegas y plantas, con estudio de la conexión y protecciones de interconexión.", refs: ["RIC 09", "RIC 03", "Ley 20.571"] },
+    { id: "solarBat", nivel: "BT", t: "Fotovoltaico con baterías o aislado", d: "Respaldo ante cortes de luz o suministro en lugares sin red, con inversor híbrido y banco de baterías.", refs: ["RIC 09", "RIC 08"] },
+    { id: "mantencion", nivel: "BT", t: "Mantención y diagnóstico de fallas", d: "Búsqueda de fallas, revisión de tableros y plan de mantención para locales y empresas.", refs: ["RIC 17"] },
+
+    { id: "subestaciones", nivel: "MT", t: "Subestaciones y salas eléctricas", d: "Proyecto, montaje y puesta en servicio de subestaciones MT/BT, celdas y salas eléctricas.", refs: ["DS 109", "RIC 13"] },
+    { id: "redes", nivel: "MT", t: "Redes y empalmes en media tensión", d: "Tendido de líneas y cables MT privados, empalmes y terminaciones.", refs: ["DS 109"] },
+    { id: "ingenieria", nivel: "MT", t: "Ingeniería y estudios eléctricos", d: "Planos, memoria de cálculo, estudios de cortocircuito y coordinación de protecciones.", refs: ["DS 109", "RIC 18"] },
+    { id: "mantencionMT", nivel: "MT", t: "Mantención de subestaciones y celdas", d: "Mantención preventiva, termografía y revisión de protecciones con registro de cada intervención.", refs: ["DS 109", "RIC 17"] },
+    { id: "pruebas", nivel: "MT", t: "Pruebas y puesta en servicio", d: "Medición de aislación, pruebas de protecciones y verificación previa a energizar.", refs: ["DS 109", "RIC 19"] },
+    { id: "respaldo", nivel: "MT", t: "Respaldo y grupos generadores", d: "Instalación de generadores, transferencia automática y sistemas de emergencia.", refs: ["RIC 08", "RIC 09"] }
+  ],
+  guia: {
+    tipos: [
+      { id: "casa", t: "Casa o departamento" },
+      { id: "comercio", t: "Local u oficina" },
+      { id: "industria", t: "Industria o faena" },
+      { id: "mt", t: "Subestación o red de media tensión" }
+    ],
+    necesidades: [
+      { id: "nueva", t: "Instalación nueva" },
+      { id: "ampliar", t: "Ampliar o modificar" },
+      { id: "regularizar", t: "Regularizar o certificar" },
+      { id: "falla", t: "Falla o mantención" },
+      { id: "solar", t: "Paneles solares" },
+      { id: "vehiculo", t: "Cargador de auto eléctrico" }
+    ],
+    servicioBT: { nueva: "nuevas", ampliar: "nuevas", regularizar: "tramites", falla: "mantencion", solar: "solar", vehiculo: "ve" },
+    servicioMT: { nueva: "subestaciones", ampliar: "redes", regularizar: "pruebas", falla: "mantencionMT", solar: "ingenieria", vehiculo: "ingenieria" },
+    detalle: {
+      nueva:       { pasos: ["Visita para levantar cargas y definir el punto de empalme", "Proyecto y planos si la potencia lo exige", "Ejecución por instalador autorizado", "Declaración en SEC y conexión por la distribuidora"], docs: ["Dirección y rol del inmueble", "Planos o croquis, si existen", "Lista de artefactos o equipos previstos"], normas: ["RIC 01", "RIC 03", "RIC 04", "RIC 18"] },
+      ampliar:     { pasos: ["Revisión de la instalación existente y su capacidad", "Cálculo de la carga adicional", "Ejecución y ajuste de tablero y protecciones", "Nueva declaración si corresponde"], docs: ["Declaración o certificado anterior, si lo tienes", "Foto del tablero y del medidor", "Descripción de lo que se agregará"], normas: ["RIC 03", "RIC 02", "RIC 18"] },
+      regularizar: { pasos: ["Visita y revisión punto por punto", "Informe de observaciones y correcciones", "Corrección de lo que no cumple", "Declaración ante la SEC"], docs: ["Boleta de luz o número de cliente", "Declaraciones anteriores, si existen", "Acceso al tablero y a la puesta a tierra"], normas: ["RIC 18", "RIC 19", "RIC 06"] },
+      falla:       { pasos: ["Diagnóstico de la falla en terreno", "Informe con causa y reparación propuesta", "Reparación o recambio", "Pruebas y recomendaciones de mantención"], docs: ["Desde cuándo ocurre y qué la acompaña (olor, chispas, saltos del diferencial)", "Foto del tablero", "Equipos conectados al circuito afectado"], normas: ["RIC 17", "RIC 05"] },
+      solar:       { pasos: ["Evaluación de consumo, techumbre y sombras", "Diseño del sistema y solicitud de conexión a la distribuidora", "Instalación y pruebas", "Declaración TE-4 en SEC y medidor bidireccional"], docs: ["Últimas boletas de luz", "Fotos del techo y del tablero", "Potencia contratada y número de cliente", "Autorización del propietario, si arriendas"], normas: ["RIC 09", "TE-4", "Ley 20.571"] },
+      vehiculo:    { pasos: ["Revisión de capacidad disponible", "Definición de cargador y circuito dedicado", "Instalación con protecciones propias", "Pruebas y entrega con informe"], docs: ["Modelo del vehículo y cargador, si ya lo tienes", "Foto del tablero", "Distancia del estacionamiento al tablero"], normas: ["RIC 15", "RIC 03"] }
+    },
+    normasMT: ["DS 109", "RIC 13"],
+    aviso: "La clase de instalador, si necesitas proyecto y el trámite exacto dependen de la potencia y del tipo de instalación. Lo confirmamos en la visita."
+  },
+  solar: {
+    tipos: [
+      { t: "Residencial con pago de excedentes", d: "Paneles en el techo conectados a la red. Lo que no consumes se inyecta y se descuenta en tu boleta (Ley 20.571)." },
+      { t: "Comercial e industrial", d: "Sistemas de mayor potencia para locales, bodegas y plantas, con estudio de la conexión y protecciones de interconexión." },
+      { t: "Con baterías o aislado", d: "Respaldo ante cortes o suministro donde no hay red, con inversor híbrido y banco de baterías." }
+    ],
+    tramite: [
+      "Evaluamos consumo, techumbre y sombras",
+      "Solicitamos la conexión a tu distribuidora",
+      "Instalamos y probamos el sistema",
+      "Presentamos la declaración TE-4 en SEC",
+      "La distribuidora instala el medidor bidireccional"
+    ],
+    panelW: 550,          // potencia de cada panel, en W
+    m2PorPanel: 2.6,      // superficie aproximada por panel, en m²
+    consumoEjemplo: 350,  // kWh/mes mostrados al cargar
+    zonaInicial: 1,
+    zonas: [              // kWh generados al mes por cada kWp instalado (valores referenciales, editar)
+      { t: "Norte (Arica a Atacama)", kwhKwpMes: 155 },
+      { t: "Centro (Coquimbo a Maule)", kwhKwpMes: 130 },
+      { t: "Sur (Ñuble a Los Lagos)", kwhKwpMes: 100 },
+      { t: "Austral (Aysén y Magallanes)", kwhKwpMes: 75 }
+    ],
+    nota: "Estimación referencial. El diseño real depende de orientación, inclinación, sombras y de tu tarifa; lo confirmamos en la visita."
+  },
+  normativa: [
+    { code: "DS 8", sub: "Min. Energía", t: "Reglamento de seguridad de las instalaciones de consumo de energía eléctrica", d: "Rige el diseño, construcción, operación y mantenimiento de instalaciones de consumo (casas, comercio, industria) hasta el punto de conexión con la red. Se desarrolla en los pliegos técnicos RIC 01 a 19.", href: "https://modulor.cl/especialidades/electricidad/ds-08-reglamento-consumo/", link: "Ver detalle" },
+    { code: "DS 109", sub: "Min. Energía", t: "Reglamento de seguridad de las instalaciones eléctricas", d: "Cubre producción, transporte, almacenamiento y distribución de energía, incluidas subestaciones y redes. Se desarrolla en los pliegos RPTD 01 a 17, dictados por la SEC.", href: "https://modulor.cl/especialidades/electricidad/ds-109-reglamento-seguridad/", link: "Ver detalle" },
+    { code: "TE-1", sub: "Trámite SEC", t: "Declaración de instalación eléctrica interior", d: "La presenta un instalador autorizado una vez ejecutada la instalación. Es el respaldo formal de que cumple la norma (RIC 18 y 19).", href: "https://www.sec.cl", link: "Ir a SEC" },
+    { code: "TE-4", sub: "Trámite SEC", t: "Declaración de puesta en servicio de generadoras residenciales", d: "Aplica a sistemas de generación conectados a la red en viviendas, por ejemplo paneles solares.", href: "https://www.chileatiende.gob.cl/fichas/48597-declaracion-de-puesta-en-servicio-de-generadoras-residenciales-te4", link: "Ver ficha" },
+    { code: "Ley 20.571", sub: "Net billing", t: "Generación distribuida y pago de excedentes", d: "Permite a clientes regulados inyectar a la red la energía que generan con fuentes renovables y recibir un descuento por esos excedentes en su boleta. Fue modificada por la Ley 21.118.", href: "https://www.iea.org/policies/12967-new-net-billing-and-distributed-generation-law-law-21118", link: "Ver detalle" },
+    { code: "Licencia", sub: "Instalador", t: "Licencia de instalador eléctrico SEC", d: "Solo un instalador con licencia vigente puede declarar instalaciones. La clase de la licencia limita la potencia y el tipo de instalación que puede firmar.", href: "https://www.chileatiende.gob.cl/fichas/ver/2662", link: "Ver ficha" }
+  ],
+  rics: [
+    ["01", "Empalmes"], ["02", "Tableros"], ["03", "Alimentadores y demanda eléctrica"], ["04", "Conductores y canalizaciones"],
+    ["05", "Protección contra tensiones peligrosas"], ["06", "Puesta a tierra y enlace equipotencial"], ["07", "Instalación de equipos"],
+    ["08", "Sistemas de emergencia"], ["09", "Sistemas de autogeneración"], ["10", "Uso general: alumbrado y enchufes"],
+    ["11", "Edificios y locales de reunión de personas"], ["12", "Ambientes especiales"], ["13", "Subestaciones y salas eléctricas"],
+    ["14", "Eficiencia energética"], ["15", "Infraestructura para recarga de vehículos eléctricos"], ["16", "Subsistemas de distribución"],
+    ["17", "Operación y mantenimiento"], ["18", "Presentación de proyectos y trámite TE-1"], ["19", "Puesta en servicio y verificación"]
+  ],
+  proceso: [
+    { t: "Contacto", d: "Nos cuentas qué necesitas por el formulario o WhatsApp." },
+    { t: "Visita técnica", d: "Levantamos la instalación en terreno, medimos y sacamos fotos." },
+    { t: "Presupuesto", d: "Recibes alcance, plazos y valores por escrito." },
+    { t: "Ejecución", d: "Trabajo con materiales certificados y personal autorizado." },
+    { t: "Declaración SEC", d: "Presentamos la declaración y entregamos los documentos." },
+    { t: "Garantía", d: "Seguimiento posterior y respaldo del trabajo." }
+  ],
+  plazos: {
+    respuesta: "Respondemos tu solicitud en 1 día hábil.",
+    presupuesto: "Presupuesto formal en 3 a 5 días hábiles tras la visita."
+  },
+  faq: [
+    { q: "¿Qué diferencia hay entre baja y media tensión?", a: "En términos generales, baja tensión es hasta 1 kV (en Chile 220 V monofásico y 380 V trifásico a 50 Hz) y media tensión está sobre ese valor, con redes de distribución típicas de 12 a 23 kV. Los límites exactos y las exigencias de cada caso están en los reglamentos." },
+    { q: "¿Qué es el TE-1 y para qué sirve?", a: "Es la declaración de instalación eléctrica interior que presenta un instalador autorizado ante la SEC una vez terminada la obra. Sirve para respaldar que la instalación cumple la norma y, en obras nuevas, para que la distribuidora conecte el suministro." },
+    { q: "¿Necesito proyecto o basta con una declaración?", a: "Depende de la potencia instalada y del tipo de inmueble. En muchos casos de menor tamaño basta la declaración; en instalaciones mayores se exige proyecto. En la visita te decimos cuál corresponde." },
+    { q: "¿Qué incluye la visita técnica?", a: "Revisión del tablero, medidor, puesta a tierra y circuitos principales, registro fotográfico y un informe con observaciones. Ajusta este texto según lo que realmente incluya tu servicio." },
+    { q: "¿Qué datos debo tener a mano para un presupuesto?", a: "Dirección, fotos del tablero y del medidor, boleta de luz reciente, planos si existen y una lista de lo que se quiere instalar. Con eso podemos acotar bastante el valor antes de ir." },
+    { q: "¿Instalan sistemas fotovoltaicos?", a: "Sí, en baja tensión: residencial, comercial e industrial, con o sin baterías. Diseñamos el sistema, instalamos y hacemos el trámite de la declaración ante la SEC." },
+    { q: "¿Cómo funciona el pago de excedentes (net billing)?", a: "Tu sistema alimenta primero tu consumo. Lo que sobra se inyecta a la red y la distribuidora lo descuenta en tu boleta, según la Ley 20.571. Para eso se instala un medidor bidireccional una vez presentada la declaración TE-4." },
+    { q: "¿Qué hace mi sistema fotovoltaico si se corta la luz?", a: "Un sistema conectado a la red se desconecta automáticamente durante un corte, por seguridad de quienes trabajan en la red. Si quieres tener electricidad en esos casos, necesitas un inversor híbrido con baterías." },
+    { q: "¿Cuánto voy a ahorrar con paneles solares?", a: "Depende de tu consumo, de la orientación y sombras del techo y de tu tarifa. La calculadora de esta página estima tamaño y generación; el ahorro real lo calculamos en la visita con tus boletas." },
+    { q: "¿Atienden empresas con subestación propia?", a: "Sí. Hacemos proyecto, montaje, pruebas y mantención de subestaciones y celdas en media tensión, siempre con los pliegos del DS 109 como base." }
+  ],
+  legal: {
+    consentimiento: "Acepto que usen estos datos solo para responder mi solicitud.",
+    aviso: "Las referencias normativas son informativas. Verifica siempre el texto oficial vigente en sec.cl y bcn.cl."
+  }
+};
+
+/* ========================= Código (no requiere edición) ========================= */
+const $ = (s, r = document) => r.querySelector(s);
+const get = (o, p) => p.split(".").reduce((a, k) => a && a[k], o);
+const svcById = id => CONFIG.servicios.find(s => s.id === id);
+
+document.querySelectorAll("[data-c]").forEach(n => { n.textContent = get(CONFIG, n.dataset.c) || ""; });
+document.title = CONFIG.empresa.nombre;
+
+$("#creds").innerHTML = CONFIG.credenciales.map(c => `<li>${c}</li>`).join("");
+$("#ladder").innerHTML = CONFIG.niveles.map(n => `<div class="lv ${n.cls}"><div class="k">${n.k}</div><div class="v">${n.v}</div><div class="d">${n.d}</div></div>`).join("");
+$("#steps").innerHTML = CONFIG.proceso.map(p => `<li><h3>${p.t}</h3><p>${p.d}</p></li>`).join("");
+$("#faqs").innerHTML = CONFIG.faq.map(f => `<details><summary>${f.q}</summary><p>${f.a}</p></details>`).join("");
+$("#rics").innerHTML = CONFIG.rics.map(r => `<li><b>RIC ${r[0]}</b><span>${r[1]}</span></li>`).join("");
+$("#norm").innerHTML = CONFIG.normativa.map(n => `<div class="nrow"><div class="code">${n.code}<small>${n.sub}</small></div><div><h3>${n.t}</h3><p>${n.d}</p></div><a href="${n.href}" target="_blank" rel="noopener">${n.link} ↗</a></div>`).join("");
+
+/* Formulario: selects */
+$("#inmueble").innerHTML = `<option value="">Seleccionar</option>` + CONFIG.inmuebles.map(i => `<option>${i}</option>`).join("");
+const fillServicios = () => {
+  const bt = CONFIG.servicios.filter(s => s.nivel === "BT"), mt = CONFIG.servicios.filter(s => s.nivel === "MT");
+  const opt = s => `<option value="${s.id}">${s.t}</option>`;
+  $("#servicio").innerHTML = `<option value="">Aún no lo sé</option><optgroup label="Baja tensión">${bt.map(opt).join("")}</optgroup><optgroup label="Media tensión">${mt.map(opt).join("")}</optgroup><option value="otro">Otro</option>`;
+};
+fillServicios();
+
+/* Servicios por pestaña */
+let nivelActual = "BT";
+function renderServicios() {
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.nivel === nivelActual)));
+  $("#svc").innerHTML = CONFIG.servicios.filter(s => s.nivel === nivelActual).map(s => `
+    <article class="card"><h3>${s.t}</h3><p>${s.d}</p>
+      <div class="chips">${s.refs.map(r => `<span class="chip">${r}</span>`).join("")}</div>
+      <div class="push"><button class="btn btn-line btn-sm" type="button" data-pedir="${s.id}">Pedir presupuesto</button></div>
+    </article>`).join("");
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { nivelActual = t.dataset.nivel; renderServicios(); }));
+renderServicios();
+
+function irAlFormulario(tipo) {
+  if (tipo) { const r = $(`input[name=tipo][value=${tipo}]`); if (r) { r.checked = true; actualizarForm(); } }
+  $("#contacto").scrollIntoView({ behavior: "smooth" });
+}
+$("#svc").addEventListener("click", e => {
+  const b = e.target.closest("[data-pedir]"); if (!b) return;
+  const s = svcById(b.dataset.pedir);
+  $("#servicio").value = s.id; $("#nivel").value = s.nivel === "MT" ? "Media tensión" : "Baja tensión";
+  irAlFormulario("presupuesto");
+});
+document.querySelectorAll("[data-go]").forEach(a => a.addEventListener("click", () => { const r = $(`input[name=tipo][value=${a.dataset.go}]`); if (r) { r.checked = true; actualizarForm(); } }));
+
+/* Asistente */
+const W = { tipo: null, need: null };
+function renderOpts() {
+  const mk = (arr, key) => arr.map(o => `<button type="button" class="opt" data-k="${key}" data-id="${o.id}" aria-pressed="${W[key] === o.id}">${o.t}</button>`).join("");
+  $("#w-tipo").innerHTML = mk(CONFIG.guia.tipos, "tipo");
+  $("#w-need").innerHTML = mk(CONFIG.guia.necesidades, "need");
+}
+function renderResultado() {
+  const out = $("#w-out");
+  if (!W.tipo || !W.need) { out.innerHTML = `<div class="result empty"><h3>Tu recomendación aparece aquí</h3><p>Elige el tipo de instalación y lo que necesitas hacer.</p></div>`; return; }
+  const g = CONFIG.guia, mt = W.tipo === "mt";
+  const svc = svcById((mt ? g.servicioMT : g.servicioBT)[W.need]);
+  const d = g.detalle[W.need];
+  const normas = [...new Set([...(mt ? g.normasMT : []), ...d.normas])];
+  out.innerHTML = `<div class="result">
+    <div><span class="eyebrow">${mt ? "Media tensión" : "Baja tensión"}</span><h3 style="margin-top:.4rem">${svc.t}</h3></div>
+    <div><h4>Normativa asociada</h4><div class="chips">${normas.map(n => `<span class="chip">${n}</span>`).join("")}</div></div>
+    <div><h4>Cómo suele avanzar</h4><ol>${d.pasos.map(p => `<li>${p}</li>`).join("")}</ol></div>
+    <div><h4>Ten a mano</h4><ol>${d.docs.map(p => `<li>${p}</li>`).join("")}</ol></div>
+    <div class="cta-row" style="margin:0"><button class="btn btn-primary" type="button" id="w-use">Usar en el formulario</button></div>
+    <p class="note">${g.aviso}</p></div>`;
+}
+document.addEventListener("click", e => {
+  const o = e.target.closest(".opt");
+  if (o) { W[o.dataset.k] = o.dataset.id; renderOpts(); renderResultado(); return; }
+  if (e.target.id === "w-use") {
+    const mt = W.tipo === "mt", g = CONFIG.guia;
+    const svc = svcById((mt ? g.servicioMT : g.servicioBT)[W.need]);
+    $("#servicio").value = svc.id; $("#nivel").value = mt ? "Media tensión" : "Baja tensión";
+    const map = { casa: "Casa", comercio: "Local comercial u oficina", industria: "Industria o faena", mt: "Industria o faena" };
+    $("#inmueble").value = map[W.tipo];
+    const n = g.necesidades.find(x => x.id === W.need).t;
+    if (!$("#detalle").value) $("#detalle").value = `${n}. `;
+    irAlFormulario(W.need === "falla" ? "visita" : "presupuesto");
+  }
+});
+renderOpts(); renderResultado();
+
+/* Energía solar */
+const S = CONFIG.solar;
+$("#sol-types").innerHTML = S.tipos.map(t => `<div class="sol-type"><h3>${t.t}</h3><p>${t.d}</p></div>`).join("");
+$("#sol-flow").innerHTML = S.tramite.map(t => `<li>${t}</li>`).join("");
+$("#c-zona").innerHTML = S.zonas.map((z, i) => `<option value="${i}">${z.t}</option>`).join("");
+$("#c-zona").value = S.zonaInicial;
+$("#c-consumo").value = S.consumoEjemplo;
+$("#c-nota").textContent = S.nota;
+const fmt = (n, d = 1) => n.toLocaleString("es-CL", { maximumFractionDigits: d });
+let ultimoCalc = null;
+function calcSolar() {
+  const consumo = parseFloat($("#c-consumo").value), out = $("#c-out");
+  if (!(consumo > 0)) { ultimoCalc = null; out.innerHTML = `<div class="kpi" style="grid-column:1/-1"><small>Ingresa tu consumo mensual en kWh para ver la estimación.</small></div>`; return; }
+  const rend = S.zonas[+$("#c-zona").value].kwhKwpMes, cob = parseFloat($("#c-cob").value);
+  const paneles = Math.max(1, Math.ceil((consumo * cob / rend) * 1000 / S.panelW));
+  const kwp = paneles * S.panelW / 1000, gen = kwp * rend, sup = paneles * S.m2PorPanel;
+  ultimoCalc = { consumo, paneles, kwp, gen, sup, zona: S.zonas[+$("#c-zona").value].t, cob };
+  out.innerHTML = `
+    <div class="kpi"><b>${fmt(kwp)} kWp</b><small>Potencia sugerida</small></div>
+    <div class="kpi"><b>${paneles}</b><small>Paneles de ${S.panelW} W</small></div>
+    <div class="kpi"><b>${fmt(gen, 0)} kWh</b><small>Generación estimada al mes</small></div>
+    <div class="kpi"><b>${fmt(sup, 0)} m²</b><small>Superficie de techo aprox.</small></div>`;
+}
+["c-consumo", "c-zona", "c-cob"].forEach(id => $("#" + id).addEventListener("input", calcSolar));
+calcSolar();
+$("#c-pedir").addEventListener("click", () => {
+  $("#servicio").value = "solar"; $("#nivel").value = "Baja tensión";
+  if (ultimoCalc) {
+    const c = ultimoCalc;
+    $("#potencia").value = `Sistema estimado de ${fmt(c.kwp)} kWp (${c.paneles} paneles)`;
+    $("#detalle").value = `Quiero cotizar un sistema fotovoltaico. Consumo aproximado: ${fmt(c.consumo, 0)} kWh/mes. Zona: ${c.zona}. Cubrir ${Math.round(c.cob * 100)}% del consumo.`;
+  }
+  irAlFormulario("presupuesto");
+});
+
+/* Formulario */
+const hoy = new Date(); hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+$("#fecha").min = hoy.toISOString().slice(0, 10);
+const tipoSel = () => $("input[name=tipo]:checked").value;
+const TIPS = {
+  consulta: ["Cuenta qué quieres lograr y qué instalación tienes hoy.", "Si dudas de la normativa, menciona el trámite o documento que te piden."],
+  visita: ["Indica la dirección exacta de la instalación en tu mensaje.", "Si puedes, ten el tablero accesible y la boleta de luz a mano.", "Elige fecha y horario; te confirmamos por teléfono."],
+  presupuesto: ["Describe el trabajo con medidas, cantidad de puntos o equipos.", "Menciona si ya hay planos o una declaración anterior.", "Mientras más datos, más preciso el presupuesto antes de la visita."]
+};
+function actualizarForm() {
+  const t = tipoSel(), v = t === "visita";
+  $("#f-fecha").hidden = !v; $("#f-franja").hidden = !v;
+  $("#tips").innerHTML = `<b>Para avanzar más rápido</b><ul>${TIPS[t].map(x => `<li>${x}</li>`).join("")}</ul>`;
+}
+document.querySelectorAll("input[name=tipo]").forEach(r => r.addEventListener("change", actualizarForm));
+actualizarForm();
+
+const TIPO_TXT = { consulta: "una consulta", visita: "una visita técnica", presupuesto: "un presupuesto" };
+function armarMensaje() {
+  const f = id => $("#" + id).value.trim();
+  const s = svcById(f("servicio"));
+  const L = [`Hola, soy ${f("nombre")}. Quisiera solicitar ${TIPO_TXT[tipoSel()]}.`, ""];
+  L.push(`Comuna: ${f("comuna")}`);
+  L.push(`Nivel de tensión: ${f("nivel")}`);
+  if (f("inmueble")) L.push(`Inmueble: ${f("inmueble")}`);
+  if (s) L.push(`Servicio: ${s.t}`); else if (f("servicio") === "otro") L.push("Servicio: Otro");
+  if (f("potencia")) L.push(`Potencia o capacidad: ${f("potencia")}`);
+  if (tipoSel() === "visita" && f("fecha")) L.push(`Visita preferida: ${f("fecha")} · ${f("franja")}`);
+  L.push("", "Detalle:", f("detalle"), "", `Teléfono: ${f("telefono")}`);
+  if (f("email")) L.push(`Correo: ${f("email")}`);
+  return L.join("\n");
+}
+$("#form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = armarMensaje();
+  const box = $("#sent"); let estado = "Aún no se ha enviado nada. Elige cómo mandar la solicitud.";
+  if (CONFIG.formEndpoint) {
+    try {
+      const r = await fetch(CONFIG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify({ mensaje: msg, nombre: $("#nombre").value, telefono: $("#telefono").value, email: $("#email").value }) });
+      estado = r.ok ? "Solicitud enviada. Te contactaremos pronto." : "No pudimos enviarla automáticamente. Usa WhatsApp o copia el texto.";
+    } catch (_) { estado = "No pudimos enviarla automáticamente. Usa WhatsApp o copia el texto."; }
+  }
+  const wa = `https://wa.me/${CONFIG.empresa.whatsapp}?text=${encodeURIComponent(msg)}`;
+  box.innerHTML = `<div class="sent"><div><span class="eyebrow">Solicitud lista</span><h3 style="margin-top:.4rem">Revisa y envía tu solicitud</h3><p class="help" style="margin-top:.4rem;font-size:.92rem">${estado}</p></div>
+    <textarea readonly id="resumen" aria-label="Resumen de la solicitud"></textarea>
+    <div class="row"><a class="btn btn-primary" href="${wa}" target="_blank" rel="noopener">Enviar por WhatsApp</a><button class="btn btn-line" type="button" id="copiar">Copiar texto</button><button class="btn btn-line" type="button" id="editar">Editar</button></div>
+    <p class="help">También puedes pegar el texto en un correo a <b>${CONFIG.empresa.email}</b> o llamar al <b>${CONFIG.empresa.telefono}</b>.</p></div>`;
+  $("#resumen").value = msg;
+  $("#form").hidden = true; box.hidden = false; box.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("#sent").addEventListener("click", async e => {
+  if (e.target.id === "editar") { $("#sent").hidden = true; $("#form").hidden = false; return; }
+  if (e.target.id === "copiar") {
+    const ta = $("#resumen"); const b = e.target;
+    try { await navigator.clipboard.writeText(ta.value); b.textContent = "Copiado"; }
+    catch (_) { ta.select(); b.textContent = "Texto seleccionado, usa copiar"; }
+    setTimeout(() => (b.textContent = "Copiar texto"), 2200);
+  }
+});
+</script>
